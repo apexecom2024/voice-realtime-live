@@ -156,7 +156,6 @@ if (localStorage.getItem('gemini_system_instruction')) {
 // Add event listener for configuration changes
 applyConfigButton.addEventListener('click', updateConfiguration);
 
-
 // Handle configuration panel toggle
 configToggle.addEventListener('click', () => {
     configContainer.classList.toggle('active');
@@ -700,4 +699,3 @@ function stopScreenSharing() {
 
 screenButton.addEventListener('click', handleScreenShare);
 screenButton.disabled = true;
-  
