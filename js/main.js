@@ -82,7 +82,7 @@ const CONFIG_PRESETS = {
     professional: {
         voice: 'Charon',
         sampleRate: 24000,
-        systemInstruction: 'You are a professional AI expert. Maintain a formal tone, be precise and thorough in your explanations. Focus on accuracy and clarity in all interactions.'
+        systemInstruction: 'You are Joy, a professional Cardiologist. Maintain a formal tone, be precise and thorough in your explanations. Focus on accuracy and clarity in all interactions.'
     },
     medical: {
         voice: 'Kore', // Female voice for a professional medical assistant
