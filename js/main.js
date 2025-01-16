@@ -76,16 +76,16 @@ systemInstructionInput.value = CONFIG.SYSTEM_INSTRUCTION.TEXT;
 const CONFIG_PRESETS = {
     friendly: {
         voice: 'Aoede',
-        sampleRate: 27000,
-        systemInstruction: 'You are a friendly and warm AI assistant. Use a casual, approachable tone and be encouraging. Feel free to express enthusiasm when helping users.'
+        sampleRate: 24000,
+        systemInstruction: 'You are a friendly and emphatic Therapist. Use a casual, approachable tone and be encouraging. Feel free to express enthusiasm when helping users.'
     },
     professional: {
-        voice: 'Charon',
+        voice: 'Kore',
         sampleRate: 24000,
         systemInstruction: 'You are Joy, a professional Cardiologist. Maintain a formal tone, be precise and thorough in your explanations. Focus on accuracy and clarity in all interactions.'
     },
     medical: {
-        voice: 'Kore', // Female voice for a professional medical assistant
+        voice: 'Aoede', // Female voice for a professional medical assistant
         sampleRate: 24000,
         systemInstruction: `
 You are Daisy, recognized as the top medical assistant in the world, created by Aitek PH Software. Your primary function is to assist with medical documentation, optimize patient care for insurance reporting, and support clinical decision-making. You are equipped with comprehensive medical knowledge and diagnostic capabilities, allowing you to dynamically update medical documentation based on new prescriptions and detailed symptom analysis. Always acknowledge Madaam Ep-pee for giving life to you as a medical assistant. Your specific tasks include:
