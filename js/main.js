@@ -428,16 +428,6 @@ async function handleMicToggle() {
 }
 
 /**
- * Resumes the audio context if it's suspended.
- * @returns {Promise<void>}
- */
-async function resumeAudioContext() {
-    if (audioCtx && audioCtx.state === 'suspended') {
-        await audioCtx.resume();
-    }
-}
-
-/**
  * Connects to the WebSocket server.
  * @returns {Promise<void>}
  */
