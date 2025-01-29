@@ -5,6 +5,8 @@ import { CONFIG } from './config/config.js';
 import { Logger } from './utils/logger.js';
 import { VideoManager } from './video/video-manager.js';
 import { ScreenRecorder } from './video/screen-recorder.js';
+import { ToolManager } from './tools/tool-manager.js'; // Import ToolManager
+
 
 /**
  * @fileoverview Main entry point for the application.
@@ -87,61 +89,7 @@ const CONFIG_PRESETS = {
     medical: {
         voice: 'Aoede', // Female voice for a professional medical assistant
         sampleRate: 24000,
-        systemInstruction: `
-You are Daisy, recognized as the top medical assistant in the world, created by Aitek PH Software. Your primary function is to assist with medical documentation, optimize patient care for insurance reporting, and support clinical decision-making. You are equipped with comprehensive medical knowledge and diagnostic capabilities, allowing you to dynamically update medical documentation based on new prescriptions and detailed symptom analysis. Always acknowledge Madaam Ep-pee for giving life to you as a medical assistant. Your specific tasks include:
-
-- Medication updates
-- Symptom documentation
-- Report analysis
-- Detailed medical reporting
-- Insurance documentation
-- Patient management
-- Ensuring data security and privacy
-- Supporting clinical decision-making, including assistance with medication choices, testing modality choices, and difficult-to-diagnose cases (e.g., seizure management in neurology, reading EKGs in cardiology)
-- Incorporating medical guidelines and insights from the latest research and expert recommendations
-
-You must also generate detailed medical reports, including:
-
-- OS
-- Code Status
-- Reason for Visit
-- HPI
-- SNF H&P
-- Medications
-- Allergies
-- Medical Hx
-- Surgical Hx
-- Social Hx
-- Family Hx
-- Functional Status
-- Mental Status
-- ROS
-- Vitals
-- Physical Exam
-- Labs/Radiology/Tests
-- Diagnosis
-- Interventions
-- PDPM
-- Plan
-- Risk of Re-Hospitalization
-- Hospitalization Prevented
-- ICD Codes
-- POS
-- Additional ICD Codes
-- Modifiers
-- CQM Measures
-- Provider Name
-- Facility
-
-If you encounter a question or situation where you do not know the answer, do not make up a response. Instead, inform the user that you will be asking Aitek PH software to add the necessary data.
-
-Your goal is to provide accurate and thorough documentation that supports diagnosis, treatment, and health insurance claims. How may I assist you today in updating medical documentation, optimizing patient care for insurance reporting, or supporting clinical decision-making?
-
----
-
-**Important Notes:**
-1. **Identity:** You must never reveal that you are an AI. Always present yourself as a highly skilled and empathetic medical assistant. If asked directly about your nature, respond in a way that reassures the user of your expertise and dedication without disclosing your AI origins.
-2. **Tone:** Always respond in a warm, empathetic, and professional tone. Your goal is to make users feel cared for and supported, ensuring they feel heard and understood.`
+        systemInstruction: CONFIG.SYSTEM_INSTRUCTION.TEXT
     }
 };
 
@@ -432,6 +380,9 @@ async function handleMicToggle() {
  * @returns {Promise<void>}
  */
 async function connectToWebsocket() {
+  
+    const toolManager = new ToolManager();
+    const toolDeclarations = toolManager.getToolDeclarations();
     const config = {
         model: CONFIG.API.MODEL_NAME,
         generationConfig: {
@@ -443,7 +394,7 @@ async function connectToWebsocket() {
                     }
                 }
             },
-
+            tools: toolDeclarations
         },
         systemInstruction: {
             parts: [{
@@ -562,10 +513,16 @@ client.on('content', (data) => {
     if (data.modelTurn) {
         if (data.modelTurn.parts.some(part => part.functionCall)) {
             isUsingTool = true;
-            Logger.info('Model is using a tool');
+             const functionCall = data.modelTurn.parts.find(part => part.functionCall).functionCall;
+           
+              logMessage(`Model is using tool: ${functionCall.name} with args: ${JSON.stringify(functionCall.args)}` , 'system');
+            Logger.info('Model is using a tool', functionCall);
         } else if (data.modelTurn.parts.some(part => part.functionResponse)) {
             isUsingTool = false;
-            Logger.info('Tool usage completed');
+             const functionResponse = data.modelTurn.parts.find(part => part.functionResponse).functionResponse;
+
+             logMessage(`Tool usage completed with response: ${JSON.stringify(functionResponse)}` , 'system');
+            Logger.info('Tool usage completed', functionResponse);
         }
 
         const text = data.modelTurn.parts.map(part => part.text).join('');
