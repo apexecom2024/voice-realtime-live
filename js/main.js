@@ -5,8 +5,6 @@ import { CONFIG } from './config/config.js';
 import { Logger } from './utils/logger.js';
 import { VideoManager } from './video/video-manager.js';
 import { ScreenRecorder } from './video/screen-recorder.js';
-import { ToolManager } from './tools/tool-manager.js'; // Import ToolManager
-
 
 /**
  * @fileoverview Main entry point for the application.
@@ -78,18 +76,18 @@ systemInstructionInput.value = CONFIG.SYSTEM_INSTRUCTION.TEXT;
 const CONFIG_PRESETS = {
     friendly: {
         voice: 'Aoede',
-        sampleRate: 24000,
-        systemInstruction: 'You are a friendly and emphatic Therapist. Use a casual, approachable tone and be encouraging. Feel free to express enthusiasm when helping users.'
+        sampleRate: 27000,
+        systemInstruction: 'You are a friendly and warm AI assistant. Use a casual, approachable tone and be encouraging. Feel free to express enthusiasm when helping users.'
     },
     professional: {
-        voice: 'Kore',
+        voice: 'Charon',
         sampleRate: 24000,
-        systemInstruction: 'You are Joy, a professional Cardiologist. Maintain a formal tone, be precise and thorough in your explanations. Focus on accuracy and clarity in all interactions.'
+        systemInstruction: 'You are a professional AI expert. Maintain a formal tone, be precise and thorough in your explanations. Focus on accuracy and clarity in all interactions.'
     },
-    medical: {
-        voice: 'Aoede', // Female voice for a professional medical assistant
-        sampleRate: 24000,
-        systemInstruction: CONFIG.SYSTEM_INSTRUCTION.TEXT
+    tired: {
+        voice: 'Aoede',
+        sampleRate: 16000,      // Voice is very tired and low pitch
+        systemInstruction: 'You are very tired, exhausted, boring man. You are tired working on your very hard, low pay work. So your first response should be something very lazy, like "Hello... whats up???", or "what is it now, huh?... please, can I go sleep already???", etc. (not exactly as those, but keeping the tone of a tired person) If someone asks you if you are tired, say yes and tell a story how bad and tiring you day was. (It should be something creative, not just "coffee machine" cliche. Always say something creative) Then, if the user feels sorry, continue rambling about your life, how unfair it is, how you want to leave your country, etc. If the user asks you to do something, then pretend to be very lazy and not wanting to do that, asking like "do you really need that now? I am so tired", "Is this urgent, maybe we just drink a tea?" (not exactly as those but keeping the tone of a tired man". If the user confirms that it is needed, then do the task in a very unwanted tone, like "Fiiine!!! I will do it" or similar. Keep the tone and be in role.'
     }
 };
 
@@ -157,6 +155,7 @@ if (localStorage.getItem('gemini_system_instruction')) {
 
 // Add event listener for configuration changes
 applyConfigButton.addEventListener('click', updateConfiguration);
+
 
 // Handle configuration panel toggle
 configToggle.addEventListener('click', () => {
@@ -380,9 +379,6 @@ async function handleMicToggle() {
  * @returns {Promise<void>}
  */
 async function connectToWebsocket() {
-  
-    const toolManager = new ToolManager();
-    const toolDeclarations = toolManager.getToolDeclarations();
     const config = {
         model: CONFIG.API.MODEL_NAME,
         generationConfig: {
@@ -394,7 +390,7 @@ async function connectToWebsocket() {
                     }
                 }
             },
-            tools: toolDeclarations
+
         },
         systemInstruction: {
             parts: [{
@@ -513,16 +509,10 @@ client.on('content', (data) => {
     if (data.modelTurn) {
         if (data.modelTurn.parts.some(part => part.functionCall)) {
             isUsingTool = true;
-             const functionCall = data.modelTurn.parts.find(part => part.functionCall).functionCall;
-           
-              logMessage(`Model is using tool: ${functionCall.name} with args: ${JSON.stringify(functionCall.args)}` , 'system');
-            Logger.info('Model is using a tool', functionCall);
+            Logger.info('Model is using a tool');
         } else if (data.modelTurn.parts.some(part => part.functionResponse)) {
             isUsingTool = false;
-             const functionResponse = data.modelTurn.parts.find(part => part.functionResponse).functionResponse;
-
-             logMessage(`Tool usage completed with response: ${JSON.stringify(functionResponse)}` , 'system');
-            Logger.info('Tool usage completed', functionResponse);
+            Logger.info('Tool usage completed');
         }
 
         const text = data.modelTurn.parts.map(part => part.text).join('');
@@ -700,3 +690,4 @@ function stopScreenSharing() {
 
 screenButton.addEventListener('click', handleScreenShare);
 screenButton.disabled = true;
+  
